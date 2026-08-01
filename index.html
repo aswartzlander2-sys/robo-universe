@@ -1,1 +1,486 @@
-<h1>Go get a job you freeloader</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robo Universal</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://drive.google.com/thumbnail?id=1zFW38ve7O-TNwEVI2gdN27XyJaJQBrT_&sz=s600">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Helvetica Medium';
+            src: local('Helvetica Neue Medium'), local('Helvetica-Medium'), local('Helvetica');
+            font-weight: 500;
+        }
+        :root {
+            --bg-color: #f0f2f5;
+            --glass-bg: rgba(255, 255, 255, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-color: #1a1a1a;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            /* ACTUAL IMAGE LINK - BRIGHT */
+            --logo-url: url('https://lh3.googleusercontent.com/d/1zFW38ve7O-TNwEVI2gdN27XyJaJQBrT_');
+            --banner-color: #305CDE;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0f172a;
+                --glass-bg: rgba(15, 23, 42, 0.6);
+                --glass-border: rgba(255, 255, 255, 0.1);
+                --text-color: #f8fafc;
+                --shadow-color: rgba(0, 0, 0, 0.5);
+                /* ACTUAL IMAGE LINK - DARK */
+                --logo-url: url('https://lh3.googleusercontent.com/d/1zbJKMMwEvzpOwnkKhmFDKSAq76Sq_ukP');
+            }
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Helvetica Medium', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            transition: background-color 0.5s ease;
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
+        /* Banner Styles */
+        #site-banner {
+            display: flex; 
+            width: 100%;
+            padding: 12px 60px 12px 16px; 
+            text-align: center;
+            font-size: 0.75rem; 
+            font-weight: 600;
+            z-index: 10005;
+            position: fixed;
+            top: 0;
+            left: 0;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            color: white;
+            transform: translateY(-100%);
+            opacity: 0;
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        #site-banner > * {
+            flex-shrink: 0;
+        }
+        .revealed #site-banner:not(.dismissed) {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        #banner-restore-tab {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: var(--banner-color);
+            z-index: 10008;
+            cursor: pointer;
+            border-radius: 0 0 4px 4px;
+            display: none;
+            transition: height 0.2s ease;
+        }
+        #banner-restore-tab:hover { height: 8px; }
+        .banner-btn {
+            background: rgba(255, 255, 255, 0.95);
+            color: #000;
+            padding: 6px 20px;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-size: 0.7rem;
+            font-weight: 800;
+        }
+        .banner-close-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border: none;
+            padding: 0;
+            margin: 0;
+            flex-shrink: 0;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .banner-close-btn:hover {
+            background: #f0f0f0;
+        }
+        .sign-in-btn {
+            background: #000;
+            color: #fff;
+            padding: 6px 20px;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-size: 0.7rem;
+            font-weight: 800;
+            display: inline-block;
+        }
+        @media (prefers-color-scheme: dark) {
+            .sign-in-btn {
+                background: rgba(255, 255, 255, 0.95);
+                color: #000;
+            }
+        }
+        #dynamic-header {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 60px; 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 10007;
+            top: 0; 
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--glass-border);
+            transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1), top 0.4s ease;
+        }
+        #dynamic-header nav {
+            opacity: 0;
+            transform: translateX(20px);
+            pointer-events: none;
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.3s;
+        }
+        .revealed #dynamic-header nav {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+        #dynamic-header.floating {
+            width: 95%;
+            max-width: 1100px;
+            height: 56px;
+            border-radius: 16px; 
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: 0 10px 40px var(--shadow-color);
+        }
+        #main-view-container {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        #hero-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 800px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            transition: all 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+        .revealed #hero-container {
+            top: 140px; 
+            left: 40px;
+            transform: translate(0, 0);
+            width: calc(100% - 80px);
+            max-width: none;
+        }
+        #splash-image {
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 1.2s cubic-bezier(0.77, 0, 0.175, 1), transform 0.4s ease;
+            box-shadow: 0 20px 50px var(--shadow-color);
+            margin: 0 auto;
+        }
+        #splash-image:hover {
+            transform: scale(1.05);
+        }
+        .revealed #splash-image {
+            margin: 0;
+            border-radius: 12px;
+            max-width: 800px; 
+        }
+        .fade-item {
+            opacity: 0;
+            transform: translateY(15px);
+            pointer-events: none;
+            width: 100%;
+        }
+        .revealed .fade-item {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        #openalice-title { 
+            margin-top: 2.5rem; 
+            font-size: 2.2rem; 
+            font-weight: 800; 
+            transition: opacity 0.8s ease 1.2s, transform 0.8s ease 1.2s;
+        }
+        #custom-hero-heading { 
+            margin-top: 1rem; 
+            font-size: 1.1rem; 
+            font-weight: 500; 
+            line-height: 1.6; 
+            width: 100%;
+            transition: opacity 0.8s ease 1.4s, transform 0.8s ease 1.4s;
+        }
+        #site-title {
+            margin-top: 2rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            transition: opacity 0.8s ease 1.6s, transform 0.8s ease 1.6s;
+        }
+        #sub-title {
+            margin-top: 0.1rem;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: opacity 0.8s ease 1.8s, transform 0.8s ease 1.8s;
+        }
+        @media (min-width: 768px) {
+            #openalice-title { font-size: 4.5rem; }
+            #site-title { font-size: 3rem; }
+            #sub-title { font-size: 1.8rem; }
+            .revealed #splash-image { max-width: 600px; }
+        }
+        #content-section {
+            width: 100%;
+            padding: 4rem 2rem;
+            margin-top: 110vh;
+            opacity: 0;
+            transition: opacity 1s ease 2s;
+        }
+        .revealed #content-section { opacity: 1; }
+        footer {
+            width: 100%;
+            padding: 2.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: auto;
+            opacity: 0;
+            transition: opacity 1s ease 1s;
+        }
+        .revealed footer { opacity: 1; }
+        /* NO CROPPING, NO PIXELATION */
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            background-image: var(--logo-url);
+            background-size: contain; /* Full image, no cropping */
+            background-repeat: no-repeat;
+            background-position: center center;
+            flex-shrink: 0;
+            image-rendering: auto; /* High-quality scaling */
+        }
+    </style>
+</head>
+<body id="page-body">
+    <div id="banner-restore-tab" onclick="restoreBanner(event)"></div>
+    <div id="site-banner">
+        <span id="banner-text"></span>
+        <a id="banner-link" class="banner-btn" href="#"></a>
+        <div onclick="dismissBanner(event)" class="banner-close-btn">
+            <span class="material-icons" style="font-size: 18px; color: #000;">close</span>
+        </div>
+    </div>
+    <header id="dynamic-header">
+        <div class="flex items-center gap-2 md:gap-3 font-bold text-[11px] md:text-sm cursor-pointer" onclick="handleBrandingClick(event)">
+            <div class="brand-logo"></div>
+            <span class="whitespace-nowrap">Robo Universal</span>
+        </div>
+        <nav class="flex gap-3 md:gap-8 items-center text-[9px] md:text-[10px] font-bold uppercase tracking-widest">
+            <a href="javascript:void(0)" onclick="navigateTo('company')" class="hover:opacity-50">Company</a>
+            <a href="javascript:void(0)" onclick="navigateTo('products')" class="hover:opacity-50">Products</a>
+            <a href="javascript:void(0)" onclick="navigateTo('news')" class="hover:opacity-50">News</a>
+            <a href="https://robodata.bsite.net/v2/signin" class="sign-in-btn">Sign In</a>
+        </nav>
+    </header>
+    <div id="main-view-container">
+        <div id="hero-container">
+            <img 
+                id="splash-image" 
+                src=""
+                alt="Landsat Image of the Text "Robo data""
+                onclick="revealText()"
+            >
+            <div id="text-stack">
+                <h1 id="openalice-title" class="fade-item">Robo Universal</h1>
+                <p id="custom-hero-heading" class="fade-item">
+                    Robo Universal is a Company that was Created by Andrew Swartzlander and provides many services from SSO, to documents, to code hosting. Robo Universal is focused on our customers, and we offer free tiers and paid teirs. (Paid Tiers is not functioning correctly at this moment) Welcome to our website.
+                </p>
+                <h1 id="site-title" class="fade-item">About Us</h1>
+                <h2 id="sub-title" class="fade-item"></h2>
+            </div>
+        </div>
+        <div id="content-section"></div>
+    </div>
+    <footer id="main-footer">
+        <div class="flex flex-col items-center gap-4 font-bold opacity-40 text-[10px] md:text-xs text-center">
+            <div class="flex items-center gap-3">
+                <div class="brand-logo" style="width: 28px; height: 28px;"></div>
+                <span>Robo 2026</span>
+                <span>•</span>
+                <a href="https://robodata.bsite.net/privacypolicy" target="_blank" class="hover:opacity-100">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+    <script>
+        const splashImages = [
+            'https://lh3.googleusercontent.com/d/1-CJIK3CasVvYY3UiCB99O_PbrmraShIB',
+            'https://lh3.googleusercontent.com/d/12pmS1JPdv9a3qmT4O_H1LWqHHwuRvg1J',
+            'https://lh3.googleusercontent.com/d/1FlmLEzyDN82qcD3QxMNN67P_fVZw_TeO',
+            'https://lh3.googleusercontent.com/d/1l1aa4NGUhh8J-gKi86PGFymBJA7z69oa',
+            'https://lh3.googleusercontent.com/d/1uuCpOCgksz1gyDjsgP91xdDMRJP9O_VV',
+            'https://lh3.googleusercontent.com/d/1Lx7tRxaGq_W5sDQz-2b5i-Z3baYzj-Pm'
+        ];
+        const bannerConfig = {
+            enabled: "no",
+            color: "#305CDE",
+            text: "We are Switching Domains",
+            button: "yes",
+            buttonText: "Go to new Website",
+            buttonLink: "https://robodata.bsite.net"
+        };
+        const header = document.getElementById('dynamic-header');
+        const banner = document.getElementById('site-banner');
+        const body = document.getElementById('page-body');
+        const restoreTab = document.getElementById('banner-restore-tab');
+        let bannerDismissed = false;
+        function updateHeaderPosition() {
+            const isFloating = header.classList.contains('floating');
+            const isRevealed = body.classList.contains('revealed');
+            const bannerEnabled = bannerConfig.enabled === "yes";
+            const bannerVisible = bannerEnabled && !bannerDismissed && isRevealed;
+            const bannerHeight = bannerVisible ? banner.offsetHeight : 0;
+            header.style.top = isFloating ? (bannerHeight + 10) + "px" : bannerHeight + "px";
+            
+            if (!bannerEnabled) {
+                restoreTab.style.display = 'none';
+            }
+        }
+        function dismissBanner(e) {
+            if (e) e.stopPropagation();
+            bannerDismissed = true;
+            banner.classList.add('dismissed');
+            if (bannerConfig.enabled === "yes") {
+                restoreTab.style.display = "block";
+            }
+            updateHeaderPosition();
+        }
+        function restoreBanner(e) {
+            if (e) e.stopPropagation();
+            bannerDismissed = false;
+            banner.classList.remove('dismissed');
+            restoreTab.style.display = "none";
+            updateHeaderPosition();
+        }
+        function initBanner() {
+            if (bannerConfig.enabled !== "yes") {
+                restoreTab.style.display = 'none';
+                banner.style.opacity = '0';
+                banner.style.pointerEvents = 'none';
+                return;
+            }
+            banner.style.opacity = '';
+            banner.style.pointerEvents = '';
+            banner.style.backgroundColor = bannerConfig.color;
+            document.getElementById('banner-text').innerText = bannerConfig.text;
+            const btn = document.getElementById('banner-link');
+            if (bannerConfig.button === "yes") {
+                btn.innerText = bannerConfig.buttonText;
+                btn.href = bannerConfig.buttonLink;
+                btn.style.display = 'inline-block';
+            } else {
+                btn.style.display = "none";
+            }
+        }
+        function revealText() {
+            if (!body.classList.contains('revealed')) {
+                body.classList.add('revealed');
+                body.style.overflowY = 'auto';
+                setTimeout(updateHeaderPosition, 100);
+            }
+        }
+        function handleBrandingClick(e) {
+            if (body.classList.contains('revealed')) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+        function navigateTo(pageId) {
+            const urls = {
+                'company': "https://robodata.bsite.net/company",
+                'products': "https://robodata/products",
+                'news': "https://robodata.bsite.net/blog"
+            };
+            if(urls[pageId]) window.location.href = urls[pageId];
+        }
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 30) {
+                header.classList.add('floating');
+            } else {
+                header.classList.remove('floating');
+            }
+            updateHeaderPosition();
+        });
+        window.onload = () => {
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+            const randomImage = splashImages[Math.floor(Math.random() * splashImages.length)];
+            document.getElementById('splash-image').src = randomImage;
+            body.classList.remove('revealed');
+            body.style.overflowY = 'hidden';
+            header.classList.remove('floating');
+            initBanner();
+            updateHeaderPosition();
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+                header.classList.remove('floating');
+            }, 50);
+        };
+        window.onpageshow = function(event) {
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+            const randomImage = splashImages[Math.floor(Math.random() * splashImages.length)];
+            document.getElementById('splash-image').src = randomImage;
+            body.classList.remove('revealed');
+            body.style.overflowY = 'hidden';
+            header.classList.remove('floating');
+            initBanner();
+            updateHeaderPosition();
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+                header.classList.remove('floating');
+            }, 50);
+        };
+    </script>
+</body>
+</html>
+
+
+
