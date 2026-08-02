@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmls="http://sitemaps.org">
+   <!-- Your Main Website Home Page -->
+  <url>
+    <loc>https://robo-universe.com</loc>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Your First Subdomain -->
+  <url>
+    <loc>https://millspark.robo-universe.com</loc>
+    <Priority>0.8</priority>
+  </url>
+
+  <!-- Your Second Subdomain -->
+  <url>
+    <loc>https://elaria.robo-universe.com</loc>
+    <priority>0.8</priority>
+  </url>
+</urlset>
+  
